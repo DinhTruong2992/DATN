@@ -4,5 +4,5 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Register page: http://localhost:${PORT}/register`);
+    console.log(`Shop page: http://localhost:${PORT}/shop`);
 });

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config();
 
 const connectDB = require('./config/database');
@@ -19,6 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/img', express.static('img'));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+
 
 
 // Set view engine for EJS (optional - for server-side rendering)
@@ -30,8 +33,24 @@ app.use('/api/auth', authRoutes);
 
 // Render pages
 
+app.get('/home', (req, res) => {
+    res.render('home', { active: 'home' });
+});
+
+app.get('/shop', (req, res) => {
+    res.render('shop', { active: 'shop' });
+});
+
+app.get('/favorite', (req, res) => {
+    res.render('favorite', { active: 'favorite' });
+});
+
+app.get('/cart', (req, res) => {
+    res.render('cart', { active: 'cart' });
+});
+
 app.get('/profile', (req, res) => {
-    res.render('profile');
+    res.render('profile', { active: 'profile' });
 });
 
 app.get('/register', (req, res) => {
