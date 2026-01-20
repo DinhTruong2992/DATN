@@ -41,6 +41,10 @@ app.get('/shop', (req, res) => {
     res.render('shop', { active: 'shop' });
 });
 
+app.get('/productDetail', (req, res) => {
+    res.render('productDetail', { active: 'productDetail' });
+});
+
 app.get('/favorite', (req, res) => {
     res.render('favorite', { active: 'favorite' });
 });
@@ -56,6 +60,28 @@ app.get('/profile', (req, res) => {
 app.get('/register', (req, res) => {
     res.render('register');
 });
+
+app.get('/product/:id', (req, res) => {
+    // MOCK DATA – sau này lấy từ Mongo bằng id
+    const product = {
+        id: req.params.id,
+        name: 'Robot biến hình',
+        price: 350000,
+        description: 'Robot biến hình thông minh cho trẻ em từ 6 tuổi.',
+        images: [
+            'https://via.placeholder.com/400',
+            'https://via.placeholder.com/400',
+            'https://via.placeholder.com/400'
+        ],
+        category: 'Robot'
+    };
+
+    res.render('product-detail', {
+        product,
+        active: 'shop'
+    });
+});
+
 
 app.get('/login', (req, res) => {
     res.render('login');
