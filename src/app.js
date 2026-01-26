@@ -10,96 +10,125 @@ const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
-// Connect to MongoDB
+/* =======================
+   DATABASE
+======================= */
 connectDB();
 
-// Middleware
+/* =======================
+   MIDDLEWARE
+======================= */
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
+// Static assets
 app.use(express.static(path.join(__dirname, '../assets')));
 
-// Set view engine
+/* =======================
+   VIEW ENGINE
+======================= */
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// API Routes
+/* =======================
+   API ROUTES
+======================= */
 app.use('/api/auth', authRoutes);
 
-// Page Routes
+/* =======================
+   PAGE ROUTES
+======================= */
+
+// Splash
 app.get('/', (req, res) => {
-    res.redirect('/login');
+    res.redirect('/splash');
 });
 
+app.get('/splash', (req, res) => {
+    res.render('splash');
+});
+
+// Auth pages
 app.get('/login', (req, res) => {
-    const message = req.query.registered ? {
-        type: 'success',
-        text: 'Registration successful! Please login.'
-    } : null;
-    
+    const message = req.query.registered
+        ? { type: 'success', text: 'Registration successful! Please login.' }
+        : req.query.error
+        ? { type: 'danger', text: decodeURIComponent(req.query.error) }
+        : null;
+
     res.render('login', { message });
 });
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    const message = req.query.error
+        ? { type: 'danger', text: decodeURIComponent(req.query.error) }
+        : null;
+
+    res.render('register', { message });
 });
 
-// Dashboard route (protected - example)
-app.get('/dashboard', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Dashboard</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <div class="container">
-                    <a class="navbar-brand" href="#">Auth App</a>
-                    <div class="navbar-nav ms-auto">
-                        <a class="nav-link" href="/login">Logout</a>
-                    </div>
-                </div>
-            </nav>
-            <div class="container mt-5">
-                <h1>Welcome to Dashboard</h1>
-                <p>This is a protected page.</p>
-                <a href="/login" class="btn btn-secondary">Go to Login</a>
-            </div>
-        </body>
-        </html>
-    `);
+app.get('/forgotpassword', (req, res) => {
+    res.render('forgotpassword');
 });
 
-// Health check endpoint
+// Shop
+app.get('/shop', (req, res) => {
+    res.render('shop', { active: 'shop' });
+});
+
+app.get('/product/:id', (req, res) => {
+    // MOCK – sau này lấy từ MongoDB
+    const product = {
+        _id: req.params.id,
+        name: 'Robot biến hình',
+        price: 350000,
+        description: 'Robot biến hình thông minh cho trẻ em.',
+        images: [
+            'https://via.placeholder.com/400',
+            'https://via.placeholder.com/400'
+        ],
+        category: 'Robot'
+    };
+
+    res.render('product-detail', { product, active: 'shop' });
+});
+
+app.get('/favorite', (req, res) => {
+    res.render('favorite', { active: 'favorite' });
+});
+
+app.get('/cart', (req, res) => {
+    res.render('cart', { active: 'cart' });
+});
+
+app.get('/profile', (req, res) => {
+    res.render('profile', { active: 'profile' });
+});
+
+/* =======================
+   HEALTH CHECK
+======================= */
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
-        timestamp: new Date().toISOString(),
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        version: process.env.npm_package_version || '1.0.0'
+        time: new Date().toISOString()
     });
 });
 
-// Error handling middleware
+/* =======================
+   ERROR HANDLING
+======================= */
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    
-    const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-    
-    res.status(statusCode).json({
+    res.status(500).json({
         success: false,
-        message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        message: err.message || 'Internal Server Error'
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -108,36 +137,3 @@ app.use((req, res) => {
 });
 
 module.exports = app;
-// Thêm route này vào file src/app.js, sau phần middleware
-
-// Splash screen route
-app.get('/splash', (req, res) => {
-    res.render('splash');
-});
-
-// Chuyển hướng root đến splash screen
-app.get('/', (req, res) => {
-    res.redirect('/splash');
-});
-
-// Page Routes (giữ nguyên các route cũ)
-app.get('/login', (req, res) => {
-    const message = req.query.registered ? {
-        type: 'success',
-        text: 'Registration successful! Please login.'
-    } : req.query.error ? {
-        type: 'danger',
-        text: decodeURIComponent(req.query.error)
-    } : null;
-    
-    res.render('login', { message });
-});
-
-app.get('/register', (req, res) => {
-    const message = req.query.error ? {
-        type: 'danger',
-        text: decodeURIComponent(req.query.error)
-    } : null;
-    
-    res.render('register', { message });
-});
