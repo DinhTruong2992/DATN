@@ -1,3 +1,4 @@
+// src/models/User.js - Phiên bản đơn giản hơn
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -8,7 +9,8 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         minlength: [3, 'Username must be at least 3 characters'],
-        maxlength: [30, 'Username cannot exceed 30 characters']
+        maxlength: [30, 'Username cannot exceed 30 characters'],
+        match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers and underscores']
     },
     email: {
         type: String,
@@ -27,7 +29,7 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: [true, 'Phone number is required'],
-        match: [/^[0-9]{10,11}$/, 'Please enter a valid phone number']
+        match: [/^[0-9]{10,11}$/, 'Please enter a valid phone number (10-11 digits)']
     },
     createdAt: {
         type: Date,
@@ -61,6 +63,13 @@ userSchema.pre('findOneAndUpdate', function(next) {
 // Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Method to get user data without sensitive information
+userSchema.methods.toJSON = function() {
+    const user = this.toObject();
+    delete user.password;
+    return user;
 };
 
 const User = mongoose.model('User', userSchema);
