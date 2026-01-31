@@ -1,4 +1,3 @@
-// src/models/User.js - Phiên bản đơn giản hơn
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -24,21 +23,30 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required'],
         minlength: [8, 'Password must be at least 8 characters'],
-        maxlength: [16, 'Password cannot exceed 16 characters']
+        
     },
     phoneNumber: {
         type: String,
         required: [true, 'Phone number is required'],
         match: [/^[0-9]{10,11}$/, 'Please enter a valid phone number (10-11 digits)']
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+
+    // ✅ FAVORITES PHẢI NẰM TRONG SCHEMA
+    // favorites: [
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "Product"
+    //     }
+    // ],
+
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // }
 });
 
 // Hash password before saving
@@ -60,12 +68,12 @@ userSchema.pre('findOneAndUpdate', function(next) {
     next();
 });
 
-// Method to compare password
+// Compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to get user data without sensitive information
+// Hide password
 userSchema.methods.toJSON = function() {
     const user = this.toObject();
     delete user.password;
@@ -73,5 +81,4 @@ userSchema.methods.toJSON = function() {
 };
 
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;

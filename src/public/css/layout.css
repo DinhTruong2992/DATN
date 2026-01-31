@@ -1,12 +1,20 @@
 /* Bottom navigation */
 .bottom-nav {
-    position: fixed;
+    position: fixed !important;
     bottom: 0;
     left: 0;
     right: 0;
+    height: 45px;
     background: #fff;
-    border-top: 1px solid #ddd;
-    z-index: 1000;
+    z-index: 9999;
+    width: 100%;
+    padding: 5px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+
+
+}
+body {
+    padding-bottom: 80px;
 }
 
 .nav-item img {
@@ -23,3 +31,9 @@
 .nav-item a {
     display: inline-block;
 }
+.bottom-nav img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+

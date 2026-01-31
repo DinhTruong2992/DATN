@@ -1,6 +1,4 @@
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
 
 // Register
 const registerUser = async (req, res) => {
@@ -21,7 +19,7 @@ const registerUser = async (req, res) => {
     const user = new User({
       username,
       email,
-      password,      // model tự hash
+      password,
       phoneNumber
     });
 
@@ -34,15 +32,6 @@ const registerUser = async (req, res) => {
 
   } catch (error) {
     console.error('Registration error:', error);
-
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(e => e.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(', ')
-      });
-    }
-
     res.status(500).json({
       success: false,
       message: 'Error registering user'
@@ -74,24 +63,15 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // 🔐 Tạo JWT
-    const token = jwt.sign(
-      { id: user._id, username: user.username },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
-    );
+    // 🔥 LƯU SESSION
+    req.session.user = {
+      _id: user._id,
+      username: user.username
+    };
 
     res.status(200).json({
       success: true,
       message: 'Đăng nhập thành công',
-      data: {
-        token,
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email
-        }
-      },
       redirectTo: '/shop'
     });
 
@@ -104,8 +84,15 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = {
-  register: registerUser,
-  login: loginUser
+// Logout
+const logoutUser = (req, res) => {
+  req.session.destroy(() => {
+    res.json({ success: true });
+  });
 };
 
+module.exports = {
+  register: registerUser,
+  login: loginUser,
+  logout: logoutUser
+};
