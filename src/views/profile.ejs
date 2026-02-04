@@ -58,6 +58,52 @@
             color: #f44336;
             font-weight: 600;
         }
+
+        .logout-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .logout-box {
+            background: #fff;
+            width: 85%;
+            max-width: 320px;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logout-box p {
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logout-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: #eee;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f44336;
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -65,7 +111,7 @@
 
     <div class="container mt-4">
 
-        <!-- PROFILE -->
+        <!-- PROFILE HEADER -->
         <div class="text-center">
             <div class="avatar">🧸</div>
             <h6 class="mt-2 mb-1">
@@ -76,7 +122,7 @@
             </a>
         </div>
 
-        <!-- QUICK ACTION -->
+        <!-- QUICK ACTION (chỉ để account-related) -->
         <div class="card-box mt-4">
             <div class="row">
                 <div class="col quick-item">
@@ -92,12 +138,6 @@
                     </a>
                 </div>
                 <div class="col quick-item">
-                    <span>❤️</span>
-                    <a href="/favorite" class="text-decoration-none text-dark">
-                        Yêu thích
-                    </a>
-                </div>
-                <div class="col quick-item">
                     <span>⚙️</span>
                     <a href="/settings" class="text-decoration-none text-dark">
                         Cài đặt
@@ -106,22 +146,25 @@
             </div>
         </div>
 
-        <!-- ACCOUNT -->
+        <!-- ACCOUNT SETTINGS -->
         <div class="card-box">
             <div class="list-group list-group-flush">
-                <a href="/profile" class="list-group-item d-flex justify-content-between">
+                <a href="/profile/info" class="list-group-item d-flex justify-content-between">
                     Thông tin cá nhân <span>›</span>
                 </a>
                 <a href="/change-password" class="list-group-item d-flex justify-content-between">
                     Đổi mật khẩu <span>›</span>
                 </a>
-                <a href="/logout" class="list-group-item d-flex justify-content-between logout">
+                <a href="#" class="list-group-item d-flex justify-content-between logout"
+                    onclick="openLogoutModal(event)">
                     Đăng xuất <span>›</span>
                 </a>
+
+
             </div>
         </div>
 
-        <!-- ORDER -->
+        <!-- ORDER & PAYMENT -->
         <div class="card-box">
             <div class="list-group list-group-flush">
                 <a href="/orders" class="list-group-item d-flex justify-content-between">
@@ -134,17 +177,58 @@
         </div>
 
     </div>
+    <!-- LOGOUT CONFIRM MODAL -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-box">
+            <p>Bạn có chắc muốn đăng xuất không?</p>
+            <div class="logout-actions">
+                <button class="btn-cancel" onclick="closeLogoutModal()">Hủy</button>
+                <button class="btn-confirm" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function logout(e) {
+            e.preventDefault();
+
+            await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "same-origin"
+            });
+
+            window.location.href = "/login";
+        }
+    </script>
+    <script>
+        function openLogoutModal(e) {
+            e.preventDefault();
+            document.getElementById("logoutModal").style.display = "flex";
+        }
+
+        function closeLogoutModal() {
+            document.getElementById("logoutModal").style.display = "none";
+        }
+
+        async function logout() {
+            try {
+                const res = await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "same-origin"
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    window.location.href = "/login";
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
 
     <!-- BOTTOM NAV -->
     <%- include('partials/bottom-nav', { active: 'profile' }) %>
-
-</body>
-
-</html>
-
-
-
-
 
 </body>
 
