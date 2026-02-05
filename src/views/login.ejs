@@ -35,9 +35,9 @@
         }
 
         .logo {
-            height: 60px;
+            height: 80px;
             object-fit: contain;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         .title {
@@ -249,6 +249,34 @@
             color: #111;
             text-decoration: underline;
         }
+
+        .form-group>div {
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+
+        .form-group>div:focus-within {
+            background-color: white;
+        }
+
+        .form-group>div .form-control {
+            background-color: transparent;
+        }
+
+        /* Fix màu autofill của Chrome */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #fafafa inset !important;
+            -webkit-text-fill-color: #000 !important;
+            transition: background-color 9999s ease-in-out 0s;
+        }
+
+        /* Khi focus thì vẫn trắng giống input thường */
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+        }
     </style>
 </head>
 
@@ -257,7 +285,8 @@
         <div class="header"> <img src="/images/UI/logo.jpg" alt="Logo" class="logo">
             <h1 class="title">Chào mừng trở lại</h1>
             <p class="subtitle">Đăng nhập vào tài khoản của bạn</p>
-        </div> <!-- Phần quay lại trang chủ --> <a href="/splash" class="back-link">Quay lại trang chủ</a>
+        </div>
+        <!-- Phần quay lại trang chủ <a href="/splash" class="back-link">Quay lại trang chủ</a> -->
         <% if (message) { %>
             <div class="alert alert-<%= message.type %>">
                 <%= message.text %>
@@ -307,14 +336,23 @@
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true; submitBtn.innerHTML = '<span class="loading"></span> Đang xử lý...';
             try {
-                const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }); const result = await response.json(); if (result.success) {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData), credentials: 'include'
+                }); const result = await response.json(); if (result.success) {
                     showMessage('Đăng nhập thành công! Đang chuyển hướng...', 'success');
                     // Lưu token và thông tin người dùng 
 
                     if (result.data && result.data.token) { localStorage.setItem('token', result.data.token); }
                     if (result.data && result.data.user) { localStorage.setItem('user', JSON.stringify(result.data.user)); }
                     // Chuyển hướng sau 1 giây 
-                    setTimeout(() => { window.location.href = result.redirectTo || '/shop'; }, 1000);
+                    if (result.success) {
+                        showMessage('Đăng nhập thành công!', 'success');
+
+                        setTimeout(() => {
+                            window.location.assign(result.redirectTo || '/shop');
+                        }, 800);
+                    }
+
                 }
                 else {
                     showMessage(result.message || 'Đăng nhập thất bại', 'danger');
@@ -329,9 +367,11 @@
             const errorElement = document.getElementById(fieldId); errorElement.textContent = message; errorElement.classList.add('show-error');
             // Thêm class is-invalid cho input tương ứng 
             const inputId = fieldId.replace('Error', ''); const input = document.getElementById(inputId); if (input) { input.classList.add('is-invalid'); }
-        } function showMessage(text, type) {
+        }
+        function showMessage(text, type) {
             // // Xóa thông báo cũ 
-            const existingAlert = document.querySelector('.alert'); if (existingAlert) { existingAlert.remove(); }
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) { existingAlert.remove(); }
             // // Tạo thông báo mới 
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
@@ -339,7 +379,12 @@
             // // Thêm vào container 
             const container = document.querySelector('.login-container');
             const backLink = container.querySelector('.back-link');
-            container.insertBefore(alertDiv, backLink.nextSibling);
+            // ✅ FIX ở đây
+            if (backLink) {
+                container.insertBefore(alertDiv, backLink.nextSibling);
+            } else {
+                container.prepend(alertDiv);
+            }
             //  // Tự động xóa sau 5 giây 
             setTimeout(() => { if (alertDiv.parentNode) { alertDiv.remove(); } }, 5000);
         }

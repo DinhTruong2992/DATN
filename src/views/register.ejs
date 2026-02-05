@@ -35,9 +35,9 @@
         }
 
         .logo {
-            height: 60px;
+            height: 80px;
             object-fit: contain;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         .title {
@@ -49,7 +49,7 @@
 
         .subtitle {
             color: #666;
-            font-size: 16px;
+            font-size: 20px;
             margin-bottom: 0;
         }
 
@@ -124,6 +124,16 @@
         .password-wrapper {
             position: relative;
             width: 100%;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+
+        .password-wrapper:focus-within {
+            background-color: white;
+        }
+
+        .password-wrapper .form-control {
+            background-color: transparent;
         }
 
         .password-wrapper .form-control {
@@ -212,27 +222,9 @@
             display: block;
         }
 
-        .terms {
-            margin-top: 24px;
-            font-size: 12px;
-            color: #666;
-        }
 
-        .terms label {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            cursor: pointer;
-        }
 
-        .terms input[type="checkbox"] {
-            margin-top: 2px;
-        }
 
-        .terms a {
-            color: #111;
-            text-decoration: underline;
-        }
 
         .alert {
             border-radius: 8px;
@@ -293,28 +285,48 @@
             margin-right: 8px;
             font-size: 16px;
         }
+
+        .form-control.is-invalid {
+            background-image: none !important;
+            padding-right: 45px;
+            /* giữ chỗ cho icon mắt */
+        }
     </style>
 </head>
 
 <body>
     <div class="register-container">
         <div class="header"> <img src="/images/UI/logo.jpg" alt="Logo" class="logo">
-            <h1 class="title">Tạo tài khoản</h1>
+            <h1 class="title">Tạo Tài Khoản</h1>
             <p class="subtitle">Tham gia cùng chúng tôi ngay hôm nay</p>
-        </div> <!-- Phần quay lại trang chủ --> <a href="/splash" class="back-link">Quay lại trang chủ</a>
+        </div>
+        <!-- Phần quay lại trang chủ 
+         <a href="/splash" class="back-link">Quay lại trang chủ</a> -->
         <% if (message) { %>
             <div class="alert alert-<%= message.type %>">
                 <%= message.text %>
             </div>
             <% } %>
-                <form id="registerForm">
-                    <div class="form-group"> <label for="username" class="form-label">Tên đăng nhập *</label> <input
-                            type="text" class="form-control" id="username" name="username"
-                            placeholder="Nhập tên đăng nhập (3-30 ký tự)" minlength="3" maxlength="30"
-                            pattern="[a-zA-Z0-9_]+" required> <span class="form-text">Chỉ cho phép chữ cái, số và dấu
-                            gạch dưới</span> <span class="error-message" id="usernameError"></span> </div>
-                    <div class="form-group"> <label for="email" class="form-label">Email *</label> <input type="email"
-                            class="form-control" id="email" name="email" placeholder="Nhập email của bạn" required>
+                <form id="registerForm" autocomplete="off" novalidate>
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            Tên đăng nhập *
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            autocomplete="new-username" placeholder="Nhập tên đăng nhập (3-30 ký tự)" minlength="3"
+                            maxlength="30" pattern="[a-zA-Z0-9_]+" required>
+                        <span class="form-text">
+                            Chỉ cho phép chữ cái, số và dấu
+                            gạch dưới
+                        </span>
+                        <span class="error-message" id="usernameError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            Email *
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" autocomplete="off"
+                            placeholder="Nhập email của bạn" required>
                         <span class="error-message" id="emailError"></span>
                     </div>
                     <div class="form-group"> <label for="phoneNumber" class="form-label">Số điện thoại *</label> <input
@@ -322,11 +334,15 @@
                             placeholder="Nhập số điện thoại (10-11 chữ số)" pattern="[0-9]{10,11}" required> <span
                             class="form-text">Chỉ 10-11 chữ số</span> <span class="error-message"
                             id="phoneError"></span> </div>
-                    <div class="form-group"> <label for="password" class="form-label">Mật khẩu *</label>
-                        <div class="password-wrapper"> <input type="password" class="form-control" id="password"
-                                name="password" placeholder="Nhập mật khẩu" minlength="8" maxlength="16" required>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password')"> <img
-                                    src="/images/UI/hide.jpg" alt="Toggle"> </button>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Mật khẩu *</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="password" name="password"
+                                autocomplete="new-password" placeholder="Nhập mật khẩu" minlength="8" maxlength="16"
+                                required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <img src="/images/UI/hide.jpg" alt="Toggle">
+                            </button>
                         </div>
                         <div class="requirements" style="margin-top: 10px;">
                             <div class="requirement" id="reqLength"> <span style="margin-right: 8px;">•</span> <span
@@ -338,21 +354,21 @@
                                     (!@#$%^&*...)</span> </div>
                         </div> <span class="error-message" id="passwordError"></span>
                     </div>
-                    <div class="form-group"> <label for="confirmPassword" class="form-label">Xác nhận mật khẩu *</label>
-                        <div class="password-wrapper"> <input type="password" class="form-control" id="confirmPassword"
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu *</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="confirmPassword" autocomplete="new-password"
                                 name="confirmPassword" placeholder="Xác nhận mật khẩu của bạn" required> <button
                                 type="button" class="password-toggle" onclick="togglePassword('confirmPassword')"> <img
-                                    src="/images/UI/hide.jpg" alt="Toggle"> </button> </div> <span class="error-message"
-                            id="confirmPasswordError"></span>
+                                    src="/images/UI/hide.jpg" alt="Toggle"> </button>
+                        </div> <span class="error-message" id="confirmPasswordError"></span>
                     </div>
 
 
-                    <div class="terms"> <label> <input type="checkbox" id="emailUpdates"> <span>Đăng ký nhận email để
-                                cập nhật thông tin sản phẩm, ưu đãi và quyền lợi thành viên</span> </label> <label
-                            style="margin-top: 10px;"> <input type="checkbox" id="agreeTerms" required> <span>Tôi đồng ý
-                                với <a href="#">Chính sách bảo mật</a> và <a href="#">Điều khoản sử dụng</a></span>
-                        </label> <span class="error-message" id="termsError"></span> </div> <button type="submit"
-                        class="btn-register" id="submitBtn"> Tạo tài khoản </button>
+
+                    <button type="submit" class="btn-register" id="submitBtn">
+                        Tạo tài khoản
+                    </button>
                 </form>
                 <div class="links"> <a href="/login">Đã có tài khoản? Đăng nhập</a> </div>
     </div>
@@ -445,10 +461,7 @@
             e.preventDefault();
             // Reset lỗi 
             resetErrors();
-            // Kiểm tra điều khoản 
-            if (!document.getElementById('agreeTerms').checked) {
-                showError('termsError', 'Vui lòng đồng ý với điều khoản sử dụng'); return;
-            }
+
             // Kiểm tra mật khẩu 
             if (!validatePassword()) {
                 showError('passwordError',
@@ -465,7 +478,7 @@
                 phoneNumber: document.getElementById('phoneNumber').value.trim(),
                 password: passwordInput.value,
 
-                emailUpdates: document.getElementById('emailUpdates').checked
+
             };
             // Hiển thị loading 
             const submitBtn = document.getElementById('submitBtn'); const originalText = submitBtn.innerHTML;
@@ -476,7 +489,9 @@
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
+                        body: JSON.stringify(formData),
+                        credentials: 'include'
+
                     });
                 const result = await response.json();
                 if (result.success) {
@@ -536,7 +551,11 @@
             // Thêm vào container 
             const container = document.querySelector('.register-container');
             const backLink = container.querySelector('.back-link');
-            container.insertBefore(alertDiv, backLink.nextSibling);
+            if (backLink) {
+                container.insertBefore(alertDiv, backLink.nextSibling);
+            } else {
+                container.prepend(alertDiv);
+            }
             // Tự động xóa sau 5 giây 
             setTimeout(() => {
                 if (alertDiv.parentNode) {
