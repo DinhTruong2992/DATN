@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - DATN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; padding: 20px; }
+        .status-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .status-good { background: #28a745; }
+        .status-warning { background: #ffc107; }
+        .status-bad { background: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">📊 System Status</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h5>Application Status</h5>
+                    <p>
+                        <span class="status-indicator status-good"></span>
+                        <strong>Running:</strong> Normal
+                    </p>
+                    <p><strong>Environment:</strong> <%= env %></p>
+                    <p><strong>Port:</strong> <%= port %></p>
+                    <p><strong>Uptime:</strong> <%= Math.floor(uptime / 60) %> minutes</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h5>Database Status</h5>
+                    <p>
+                        <span class="status-indicator <%= dbStatus === 'Connected' ? 'status-good' : 'status-bad' %>"></span>
+                        <strong>Status:</strong> <%= dbStatus %>
+                    </p>
+                    <p><strong>Mode:</strong> <%= dbMode %></p>
+                    <% if (demoMode) { %>
+                        <div class="alert alert-info mt-3">
+                            <small>📱 Running in DEMO MODE<br>Using mock data for demonstration</small>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/health">Health Check (JSON)</a></li>
+                        <li><a href="/">Home Page</a></li>
+                        <li><a href="/shop">Shop</a></li>
+                        <li><a href="/profile">Profile</a></li>
+                        <% if (demoMode) { %>
+                            <li><a href="/login">Demo Login</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-primary">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
