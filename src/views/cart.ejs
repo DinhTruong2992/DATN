@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/main.css">
 
     <style>
         body {
@@ -28,6 +29,11 @@
             gap: 12px;
             align-items: center;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .cart-item:hover {
+            transform: translateY(-2px);
         }
 
         .cart-item img {
@@ -41,18 +47,26 @@
         .product-name {
             font-size: 14px;
             font-weight: 500;
+            margin-bottom: 5px;
         }
 
         .price {
             color: red;
             font-weight: bold;
+            font-size: 16px;
+        }
+
+        .subtotal {
+            font-size: 14px;
+            color: #666;
+            margin-top: 3px;
         }
 
         .qty-box {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 5px;
+            margin-top: 8px;
         }
 
         .qty-btn {
@@ -62,13 +76,34 @@
             border: none;
             background: #eee;
             font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #ddd;
         }
 
         .delete-btn {
             border: none;
             background: none;
-            color: gray;
+            color: #666;
             font-size: 18px;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 5px;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #f8d7da;
+            color: #dc3545;
         }
 
         /* Checkout Bar */
@@ -78,102 +113,371 @@
             left: 0;
             right: 0;
             background: white;
-            padding: 12px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
             border-top-left-radius: 16px;
             border-top-right-radius: 16px;
+            z-index: 1000;
+        }
+
+        .checkout-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .total-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .total-amount {
+            color: #d5001c;
+            font-weight: bold;
+            font-size: 20px;
         }
 
         .checkout-btn {
             width: 100%;
-            background: #d5001c;
+            background: linear-gradient(135deg, #d5001c, #ff4757);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             border-radius: 25px;
-            margin-top: 8px;
             font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(213, 0, 28, 0.2);
+        }
+
+        .checkout-btn:hover {
+            background: linear-gradient(135deg, #c40018, #e84150);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(213, 0, 28, 0.3);
+        }
+
+        .checkout-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .empty-cart {
             text-align: center;
-            margin-top: 50px;
-            color: gray;
+            margin-top: 60px;
+            color: #666;
+            padding: 40px 20px;
+        }
+
+        .empty-cart-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-cart p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .continue-shopping {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .continue-shopping:hover {
+            background: #45a049;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d5001c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body>
 
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
 <div class="container">
     <h5 class="cart-title">🛒 Giỏ hàng của bạn</h5>
 
     <% if (items.length === 0) { %>
         <div class="empty-cart">
-            Giỏ hàng trống 😢
+            <div class="empty-cart-icon">😢</div>
+            <p>Giỏ hàng của bạn đang trống</p>
+            <a href="/shop" class="continue-shopping">Tiếp tục mua sắm</a>
         </div>
     <% } %>
 
     <% items.forEach(item => { %>
-
-        <div class="cart-item">
-            <img src="<%= item.product.image %>">
-
+        <div class="cart-item" id="item-<%= item._id %>">
+            <img src="<%= item.product.image || '/images/UI/placeholder.png' %>" 
+                 alt="<%= item.product.name %>">
+            
             <div style="flex:1">
                 <div class="product-name">
                     <%= item.product.name %>
                 </div>
-
+                
                 <div class="price">
                     <%= item.product.price.toLocaleString("vi-VN") %>₫
                 </div>
-
-                <div class="qty-box">
-                    <button class="qty-btn" onclick="updateQty('<%= item._id %>', -1)">-</button>
-                    <span><%= item.quantity %></span>
-                    <button class="qty-btn" onclick="updateQty('<%= item._id %>', 1)">+</button>
-
-                    <button class="delete-btn" onclick="deleteItem('<%= item._id %>')">🗑</button>
+                
+                <div class="subtotal">
+                    <%= (item.product.price * item.quantity).toLocaleString("vi-VN") %>₫
+                </div>
+                
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="qty-box">
+                        <button class="qty-btn" onclick="updateQty('<%= item._id %>', -1)" 
+                                <%= item.quantity <= 1 ? 'disabled' : '' %>>
+                            -
+                        </button>
+                        <span style="min-width: 30px; text-align: center;"><%= item.quantity %></span>
+                        <button class="qty-btn" onclick="updateQty('<%= item._id %>', 1)">+</button>
+                    </div>
+                    
+                    <button class="delete-btn" onclick="deleteItem('<%= item._id %>')">
+                        🗑
+                    </button>
                 </div>
             </div>
         </div>
-
     <% }) %>
 </div>
 
-<div class="checkout-bar">
-    <div>Tổng tiền: 
-        <b style="color:red">
-            <%= total.toLocaleString("vi-VN") %>₫
-        </b>
+<% if (items.length > 0) { %>
+    <div class="checkout-bar">
+        <div class="checkout-summary">
+            <div class="total-label">Tổng tiền:</div>
+            <div class="total-amount">
+                <%= total.toLocaleString("vi-VN") %>₫
+            </div>
+        </div>
+        
+        <button class="checkout-btn" onclick="proceedToCheckout()">
+            Thanh toán ngay (<%= items.length %> sản phẩm)
+        </button>
     </div>
-
-    <button class="checkout-btn">
-        Thanh toán ngay
-    </button>
-</div>
+<% } %>
 
 <script>
-async function updateQty(cartId, change) {
-    await fetch("/cart/update", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ cartId, change })
-    });
-    location.reload();
+// Hiển thị toast thông báo
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    
+    // Thêm màu sắc dựa trên loại thông báo
+    if (type === 'success') {
+        toast.style.background = '#4CAF50';
+    } else if (type === 'error') {
+        toast.style.background = '#f44336';
+    } else {
+        toast.style.background = '#333';
+    }
+    
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
 }
 
-async function deleteItem(cartId) {
-    await fetch("/cart/delete", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ cartId })
-    });
-    location.reload();
+// Hiển thị loading
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
 }
+
+// Ẩn loading
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+// Cập nhật số lượng
+async function updateQty(cartId, change) {
+    showLoading();
+    try {
+        const response = await fetch("/cart/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ cartId, change })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            location.reload();
+        } else {
+            showToast(result.message || 'Có lỗi xảy ra', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+        showToast('Lỗi kết nối mạng', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Xóa sản phẩm
+async function deleteItem(cartId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+        return;
+    }
+    
+    showLoading();
+    try {
+        const response = await fetch("/cart/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ cartId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Ẩn item với hiệu ứng
+            const itemElement = document.getElementById(`item-${cartId}`);
+            if (itemElement) {
+                itemElement.style.opacity = '0.5';
+                itemElement.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    location.reload();
+                }, 300);
+            } else {
+                location.reload();
+            }
+            
+            showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'success');
+        } else {
+            showToast(result.message || 'Có lỗi xảy ra', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        showToast('Lỗi kết nối mạng', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Chuyển đến trang thanh toán
+function proceedToCheckout() {
+    // Kiểm tra đăng nhập
+    fetch('/auth/check')
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn) {
+                // Đã đăng nhập, chuyển đến checkout
+                window.location.href = '/checkout';
+            } else {
+                // Chưa đăng nhập, chuyển đến trang đăng nhập
+                showToast('Vui lòng đăng nhập để thanh toán', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/checkout';
+                }, 1500);
+            }
+        })
+        .catch(error => {
+            console.error('Error checking auth:', error);
+            showToast('Có lỗi xảy ra', 'error');
+        });
+}
+
+// Thêm sự kiện cho phím tắt
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideLoading();
+    }
+});
+
+// Khởi tạo
+document.addEventListener('DOMContentLoaded', () => {
+    // Thêm hiệu ứng cho các item khi trang load
+    const items = document.querySelectorAll('.cart-item');
+    items.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            item.style.transition = 'opacity 0.3s, transform 0.3s';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
 </script>
 
 <%- include('partials/bottom-nav', { active:'cart' }) %>
 </body>
 </html>
-
