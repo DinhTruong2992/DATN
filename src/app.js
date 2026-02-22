@@ -94,6 +94,13 @@ app.get("/profile", (req, res) => {
   res.render("profile", { active: "profile" });
 });
 
+app.get("/payment", (req, res) => {
+  res.render("payment", {
+    user: { name: "", phone: "" },
+    cart: { items: [], totalPrice: 0 }
+  });
+});
+
 /* ======================= HEALTH CHECK ======================= */
 app.get("/health", (req, res) => {
   res.json({
@@ -118,3 +125,4 @@ app.use((req, res) => {
 });
 
 module.exports = app;
+
