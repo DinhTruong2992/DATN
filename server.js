@@ -1,9 +1,12 @@
+require('dotenv').config();
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 const express = require("express");
 const path = require("path");
 
 const app = require("./src/app");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Static folder
 app.use(express.static(path.join(__dirname, "src/public")));
