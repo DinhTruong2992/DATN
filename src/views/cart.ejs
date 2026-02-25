@@ -130,13 +130,15 @@
                             </div>
 
                             <div class="qty-box">
-                                <button class="qty-btn" onclick="updateQty('<%= item._id %>', -1)">-</button>
+                                <button class="qty-btn" onclick="updateQty('<%= item.product._id %>', -1)">-</button>
+
                                 <span>
                                     <%= item.quantity %>
                                 </span>
-                                <button class="qty-btn" onclick="updateQty('<%= item._id %>', 1)">+</button>
 
-                                <button class="delete-btn" onclick="deleteItem('<%= item._id %>')">🗑</button>
+                                <button class="qty-btn" onclick="updateQty('<%= item.product._id %>', 1)">+</button>
+
+                                <button class="delete-btn" onclick="deleteItem('<%= item.product._id %>')">🗑</button>
                             </div>
                         </div>
                     </div>
@@ -196,20 +198,20 @@
     </script>
 
     <script>
-        async function updateQty(cartId, change) {
+        async function updateQty(productId, change) {
             await fetch("/cart/update", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cartId, change })
+                body: JSON.stringify({ productId, change })
             });
             location.reload();
         }
 
-        async function deleteItem(cartId) {
+        async function deleteItem(productId) {
             await fetch("/cart/delete", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cartId })
+                body: JSON.stringify({ productId })
             });
             location.reload();
         }

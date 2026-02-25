@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 
   let total = 0;
-  cart.items.forEach(i => {
+  cart.items.forEach((i) => {
     if (i.product) {
       total += i.product.price * i.quantity;
     }
@@ -42,11 +42,11 @@ router.post("/add", async (req, res) => {
     if (!cart) {
       cart = await Cart.create({
         user: userId,
-        items: [{ product: productId, quantity: 1 }]
+        items: [{ product: productId, quantity: 1 }],
       });
     } else {
       const index = cart.items.findIndex(
-        i => i.product.toString() === productId
+        (i) => i.product.toString() === productId,
       );
 
       if (index > -1) {
@@ -59,7 +59,6 @@ router.post("/add", async (req, res) => {
     }
 
     res.json({ success: true });
-
   } catch (err) {
     console.error(err);
     res.json({ success: false });
@@ -69,21 +68,29 @@ router.post("/add", async (req, res) => {
 // ================= UPDATE QUANTITY =================
 router.post("/update", async (req, res) => {
   try {
-    const { cartId, change } = req.body;
+    const { productId, change } = req.body;
 
-    const item = await Cart.findById(cartId);
+    const cart = await Cart.findOne({
+      user: req.session.user._id
+    });
+
+    const item = cart.items.find(
+      i => i.product.toString() === productId
+    );
+
     if (!item) return res.json({ success: false });
 
     item.quantity += change;
 
     if (item.quantity <= 0) {
-      await Cart.findByIdAndDelete(cartId);
-    } else {
-      await item.save();
+      cart.items = cart.items.filter(
+        i => i.product.toString() !== productId
+      );
     }
 
-    res.json({ success: true });
+    await cart.save();
 
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.json({ success: false });
@@ -93,8 +100,18 @@ router.post("/update", async (req, res) => {
 // ================= DELETE ITEM =================
 router.post("/delete", async (req, res) => {
   try {
-    const { cartId } = req.body;
-    await Cart.findByIdAndDelete(cartId);
+    const { productId } = req.body;
+
+    const cart = await Cart.findOne({
+      user: req.session.user._id
+    });
+
+    cart.items = cart.items.filter(
+      i => i.product.toString() !== productId
+    );
+
+    await cart.save();
+
     res.json({ success: true });
   } catch {
     res.json({ success: false });
@@ -102,4 +119,3 @@ router.post("/delete", async (req, res) => {
 });
 
 module.exports = router;
-
