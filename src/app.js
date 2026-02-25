@@ -12,6 +12,7 @@ const shopRoutes = require("./routes/shopRoutes");
 const userRoutes = require("./routes/userRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 
 
@@ -48,6 +49,7 @@ app.use("/", shopRoutes);
 app.use("/favorite", favoriteRoutes);
 app.use("/", userRoutes);
 app.use("/cart", cartRoutes);
+app.use("/orders", orderRoutes);
 
 
 // Splash
@@ -86,9 +88,9 @@ app.get("/shop", (req, res) => {
 
 
 
-app.get("/cart", (req, res) => {
-  res.render("cart", { active: "cart" });
-});
+// app.get("/cart", (req, res) => {
+//   res.render("cart", { active: "cart" });
+// });
 
 app.get("/profile", (req, res) => {
   res.render("profile", { active: "profile" });

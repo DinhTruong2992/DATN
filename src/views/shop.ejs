@@ -71,7 +71,7 @@
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 12px;
             padding: 10px;
-            
+
         }
 
 
@@ -97,18 +97,60 @@
             object-fit: contain;
         }
 
+        .product-info {
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+            /* 👈 chìa khóa card đều */
+        }
+
+        .product-link {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
+        .product-link:hover {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
 
 
 
         .price {
             color: red;
             font-weight: bold;
+
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 4px;
+            
         }
 
         .heart {
             cursor: pointer;
             color: gray;
-            font-size: 18px;
+            font-size: 20px;
+            margin-left: 10px;
         }
 
         .heart.active {
@@ -154,7 +196,7 @@
     <div class="top-header">
         <form method="GET" action="/shop">
             <div class="search-box">
-                 <input type="text" name="search" placeholder="Nhập từ khóa tìm kiếm...">
+                <input type="text" name="search" placeholder="Nhập từ khóa tìm kiếm...">
             </div>
         </form>
     </div>
@@ -183,22 +225,26 @@
     <div class="product-grid">
         <% products.forEach(p=> { %>
             <div class="product-card">
-                <a href="/product/<%= p._id %>" style="text-decoration:none;color:inherit;">
-                    <img src="<%= p.image %>">
-                    <div>
-                        <%= p.name %>
-                    </div>
-                    <div class="price-row">
-                        <span class="price">
-                            <%= p.price.toLocaleString("vi-VN") %>₫
-                        </span>
-                        <span class="heart <%= favorites.includes(p._id.toString()) ? 'active' : '' %>"
-                            data-id="<%= p._id %>" onclick="toggleFav('<%= p._id %>', this, event)">
-                            ❤
-                        </span>
+                <a href="/product/<%= p._id %>" class="product-link">
 
-                    </div>
+                    <img src="<%= p.image %>" class="product-img">
 
+                    <div class="product-info">
+                        <div class="product-title">
+                            <%= p.name %>
+                        </div>
+
+                        <div class="price-row">
+                            <span class="price">
+                                <%= p.price.toLocaleString("vi-VN") %>₫
+                            </span>
+
+                            <span class="heart <%= favorites.includes(p._id.toString()) ? 'active' : '' %>"
+                                data-id="<%= p._id %>" onclick="toggleFav('<%= p._id %>', this, event)">
+                                ❤
+                            </span>
+                        </div>
+                    </div>
 
                 </a>
             </div>

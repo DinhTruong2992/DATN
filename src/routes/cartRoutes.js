@@ -8,16 +8,22 @@ router.get("/", async (req, res) => {
     return res.redirect("/login");
   }
 
-  const items = await Cart.find({
+  const cart = await Cart.findOne({
     user: req.session.user._id,
-  }).populate("product").lean();
+  }).populate("items.product");
+
+  if (!cart) {
+    return res.render("cart", { items: [], total: 0 });
+  }
 
   let total = 0;
-  items.forEach(i => {
-    total += i.product.price * i.quantity;
+  cart.items.forEach(i => {
+    if (i.product) {
+      total += i.product.price * i.quantity;
+    }
   });
 
-  res.render("cart", { items, total });
+  res.render("cart", { items: cart.items, total });
 });
 
 // ================= ADD TO CART =================
@@ -30,20 +36,26 @@ router.post("/add", async (req, res) => {
     const userId = req.session.user._id;
     const { productId } = req.body;
 
-    let existing = await Cart.findOne({
-      user: userId,
-      product: productId
-    });
+    let cart = await Cart.findOne({ user: userId });
 
-    if (existing) {
-      existing.quantity += 1;
-      await existing.save();
-    } else {
-      await Cart.create({
+    // nếu chưa có cart → tạo mới
+    if (!cart) {
+      cart = await Cart.create({
         user: userId,
-        product: productId,
-        quantity: 1
+        items: [{ product: productId, quantity: 1 }]
       });
+    } else {
+      const index = cart.items.findIndex(
+        i => i.product.toString() === productId
+      );
+
+      if (index > -1) {
+        cart.items[index].quantity += 1;
+      } else {
+        cart.items.push({ product: productId, quantity: 1 });
+      }
+
+      await cart.save();
     }
 
     res.json({ success: true });
