@@ -50,7 +50,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ['COD', 'BANKING', 'MOMO'],
+      enum: ['COD',  'VNPAY'],
       default: 'COD'
     },
 
@@ -81,5 +81,7 @@ orderSchema.pre('save', function (next) {
   }
   next();
 });
+
+
 
 module.exports = mongoose.model('Order', orderSchema);

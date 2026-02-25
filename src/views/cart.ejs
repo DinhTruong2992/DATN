@@ -153,10 +153,31 @@
             </b>
         </div>
 
-        <button class="checkout-btn" onclick="checkout()">
-            Mua hàng
+        <button class="checkout-btn" onclick="payOnline()">
+            Thanh toán online
         </button>
     </div>
+
+    <script>
+        async function payOnline() {
+            try {
+                const res = await fetch("/payment/vnpay/create", {
+                    method: "POST"
+                });
+
+                const data = await res.json();
+
+                if (data.paymentUrl) {
+                    window.location.href = data.paymentUrl;
+                } else {
+                    alert("Không tạo được link thanh toán");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi thanh toán");
+            }
+        }
+    </script>
 
     <script>
         async function checkout() {

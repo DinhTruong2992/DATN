@@ -7,12 +7,14 @@ const morgan = require("morgan");
 const path = require("path");
 require("dotenv").config();
 
+const paymentRoutes = require("./routes/paymentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const userRoutes = require("./routes/userRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+
 
 
 
@@ -45,11 +47,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/auth", authRoutes);
 
 /* ======================= PAGE ROUTES ======================= */
+app.use("/payment", paymentRoutes);
 app.use("/", shopRoutes);
 app.use("/favorite", favoriteRoutes);
 app.use("/", userRoutes);
 app.use("/cart", cartRoutes);
 app.use("/orders", orderRoutes);
+
 
 
 // Splash
