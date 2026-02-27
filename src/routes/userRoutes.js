@@ -2,55 +2,27 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 
-// PROFILE PAGE
-router.get("/profile", async (req, res) => {
-  try {
-    if (!req.session?.user) {
-      return res.redirect("/login");
-    }
-
-    const user = await User.findById(req.session.user._id).lean();
-
-    res.render("profile", {
-      user
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.send("Load profile failed");
-  }
-});
-
-// // VIEW PROFILE
-// router.get("/profile", async (req, res) => {
-//   if (!req.session?.user) {
-//     return res.redirect("/login");
-//   }
-
-//   const user = await User.findById(req.session.user._id).lean();
-
-//   res.render("profile-view", {
-//     user
-//   });
-// });
-
 // Middleware check login
 const requireLogin = (req, res, next) => {
   if (!req.session?.user) {
-    return res.redirect("/login");
+    return res.status(401).render("need-login", {
+      message: "Vui lòng đăng nhập để truy cập trang này"
+    });
   }
   next();
 };
 
-// ===== PROFILE MENU =====
-router.get("/profile", requireLogin, (req, res) => {
+// ===== PROFILE PAGE =====
+router.get("/profile", requireLogin, async (req, res) => {
+  const user = await User.findById(req.session.user._id).lean();
+
   res.render("profile", {
-    user: req.session.user,
+    user,
     active: "profile"
   });
 });
 
-// ===== VIEW PROFILE INFO =====
+// ===== PROFILE INFO =====
 router.get("/profile/info", requireLogin, async (req, res) => {
   const user = await User.findById(req.session.user._id).lean();
 
@@ -60,27 +32,24 @@ router.get("/profile/info", requireLogin, async (req, res) => {
   });
 });
 
-// Trang chỉnh sửa 
-router.get("/profile/edit", async (req, res) => {
-  if (!req.session?.user) {
-    return res.redirect("/login");
-  }
-
+// ===== EDIT PROFILE =====
+router.get("/profile/edit", requireLogin, async (req, res) => {
   const user = await User.findById(req.session.user._id).lean();
   res.render("profile-edit", { user });
 });
-// ================= UPDATE PROFILE =================
+
+// ===== UPDATE PROFILE =====
 router.post("/profile/edit", requireLogin, async (req, res) => {
   const { username, phoneNumber } = req.body;
 
   await User.findByIdAndUpdate(req.session.user._id, {
     username,
-    phoneNumber
+    phoneNumber,
   });
 
-  // cập nhật lại session
   req.session.user.username = username;
 
   res.redirect("/profile");
 });
+
 module.exports = router;

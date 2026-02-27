@@ -220,9 +220,14 @@
 
                 if (data.success) {
                     el.classList.toggle("active");
+                    showToast("❤️ Đã cập nhật sản phẩm yêu thích");
+                } else {
+                    showToast("⚠️ Bạn cần đăng nhập");
                 }
+
             } catch (err) {
                 console.error(err);
+                showToast("❌ Lỗi hệ thống");
             }
         }
     </script>

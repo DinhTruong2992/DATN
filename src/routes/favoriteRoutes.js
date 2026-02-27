@@ -5,19 +5,22 @@ const Favorite = require("../models/Favorite");
 
 // Xem trang yêu thích
 router.get("/", async (req, res) => {
-  if (!req.session?.user) {
-    return res.redirect("/login");
-  }
+ if (!req.session?.user) {
+  return res.status(401).render("need-login", {
+    message: "Vui lòng đăng nhập để sử dụng giỏ hàng"
+  });
+}
 
   const favorites = await Favorite.find({
-    user: req.session.user._id
-  }).populate("product").lean();
+    user: req.session.user._id,
+  })
+    .populate("product")
+    .lean();
 
   res.render("favorite", {
-    products: favorites.map(f => f.product)
+    products: favorites.map((f) => f.product),
   });
 });
-
 
 // Toggle favorite
 router.post("/toggle/:id", async (req, res) => {
@@ -56,13 +59,12 @@ router.get("/list", async (req, res) => {
   }
 
   const favs = await Favorite.find({
-    user: req.session.user._id
+    user: req.session.user._id,
   });
 
   res.json({
-    favorites: favs.map(f => f.product.toString())
+    favorites: favs.map((f) => f.product.toString()),
   });
 });
-
 
 module.exports = router;

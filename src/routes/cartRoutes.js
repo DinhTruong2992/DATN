@@ -4,9 +4,12 @@ const Cart = require("../models/Cart");
 
 // ================= GET CART =================
 router.get("/", async (req, res) => {
-  if (!req.session?.user) {
-    return res.redirect("/login");
-  }
+if (!req.session?.user) {
+  return res.status(401).render("need-login", {
+    message: "Vui lòng đăng nhập để sử dụng giỏ hàng"
+  });
+}
+  
 
   const cart = await Cart.findOne({
     user: req.session.user._id,

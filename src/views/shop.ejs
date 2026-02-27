@@ -143,7 +143,7 @@
             justify-content: center;
             align-items: center;
             margin-top: 4px;
-            
+
         }
 
         .heart {
@@ -288,27 +288,59 @@
         }
     </script>
     <!-- TOGGLE FAVORITE-->
+     <script>
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.bottom = "80px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.background = "rgba(0,0,0,0.8)";
+    toast.style.color = "white";
+    toast.style.padding = "10px 20px";
+    toast.style.borderRadius = "20px";
+    toast.style.zIndex = "9999";
+    toast.style.fontSize = "14px";
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2000);
+}
+</script>
 
     <script>
         async function toggleFav(id, el, event) {
-            event.preventDefault();
-            event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-            try {
-                const res = await fetch(`/favorite/toggle/${id}`, {
-                    method: "POST",
-                    credentials: "same-origin"
-                });
+    try {
+        const res = await fetch(`/favorite/toggle/${id}`, {
+            method: "POST",
+            credentials: "same-origin"
+        });
 
-                const data = await res.json();
-
-                if (data.success) {
-                    el.classList.toggle("active");
-                }
-            } catch (err) {
-                console.error("Favorite error:", err);
-            }
+        // 🔥 Check status trước
+        if (res.status === 401) {
+            showToast("⚠️ Bạn cần đăng nhập");
+            return;
         }
+
+        const data = await res.json();
+
+        if (data.success) {
+            el.classList.toggle("active");
+            showToast("❤️ Đã cập nhật sản phẩm yêu thích");
+        }
+
+    } catch (err) {
+        console.error(err);
+        showToast("❌ Lỗi hệ thống");
+    }
+}
     </script>
     <script>
         async function syncFavorites() {
