@@ -1,3 +1,70 @@
-node_modules
+# ===============================
+# Node modules
+# ===============================
+node_modules/
+
+# ===============================
+# Environment variables
+# ===============================
 .env
-uploads
+
+# ===============================
+# Logs
+# ===============================
+logs/
+*.log
+npm-debug.log*
+
+# ===============================
+# Uploads / user-generated files
+# ===============================
+uploads/
+
+# ===============================
+# OS generated files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# IDE / editor configs
+# ===============================
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.idea/
+
+# ===============================
+# MongoDB / database temp files
+# ===============================
+*.lock
+*.db
+dump/
+*.bak
+
+# ===============================
+# Archives / backup files
+# ===============================
+*.rar
+*.zip
+*.tar.gz
+*.7z
+
+# ===============================
+# Build / dist folders (if any)
+# ===============================
+dist/
+build/
+
+# ===============================
+# Optional npm lock (usually commit)
+# ===============================
+# package-lock.json
+# yarn.lock
+
+# ===============================
+# Others
+# ===============================
+coverage/
+tmp/
+temp/

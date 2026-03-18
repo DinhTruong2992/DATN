@@ -1,94 +1,211 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 
-// Hiển thị danh sách sản phẩm
+
+// ===============================
+// Danh sách sản phẩm
+// ===============================
 exports.getProducts = async (req, res) => {
+
   try {
-    // populate category để hiển thị tên danh mục
-    const products = await Product.find().populate("category");
+
+    const products = await Product.find()
+      .populate("id_category");
+
     res.render("admin/products", { products });
-  } catch (error) {
-    console.log(error);
-    res.send("Lỗi load sản phẩm");
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Lỗi tải sản phẩm");
+
   }
+
 };
 
+
+// ===============================
 // Form thêm sản phẩm
+// ===============================
 exports.getAddProduct = async (req, res) => {
+
   try {
+
     const categories = await Category.find();
+
     res.render("admin/add-product", { categories });
-  } catch (error) {
-    console.log(error);
-    res.send("Lỗi load form thêm sản phẩm");
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Lỗi tải form thêm sản phẩm");
+
   }
+
 };
 
+
+// ===============================
 // Thêm sản phẩm
+// ===============================
 exports.createProduct = async (req, res) => {
+
   try {
-    const { name, price, category, stock, description } = req.body;
 
-    if (!name || !price || !category) return res.send("Thiếu thông tin bắt buộc");
-
-    const product = new Product({
+    const {
       name,
       price,
-      category,   // là ObjectId của category
-      stock,
+      id_category,
       description,
-      image: req.file ? req.file.filename : null
+      stock,
+      specifications,
+      status
+    } = req.body;
+
+    const image = req.file ? req.file.filename : "";
+
+    await Product.create({
+      name,
+      price,
+      id_category,
+      description,
+      stock,
+      status: status || 1,
+      image,
+      specifications: specifications ? JSON.parse(specifications) : {}
     });
 
-    await product.save();
     res.redirect("/admin/products");
-  } catch (error) {
-    console.log(error);
+
+  } catch (err) {
+
+    console.log(err);
     res.send("Lỗi thêm sản phẩm");
+
   }
+
 };
 
+
+// ===============================
 // Form sửa sản phẩm
+// ===============================
 exports.getEditProduct = async (req, res) => {
+
   try {
+
     const product = await Product.findById(req.params.id);
+
     const categories = await Category.find();
-    res.render("admin/edit-product", { product, categories });
-  } catch (error) {
-    console.log(error);
-    res.send("Lỗi load form sửa sản phẩm");
+
+    res.render("admin/edit-product", {
+      product,
+      categories
+    });
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Không tìm thấy sản phẩm");
+
   }
+
 };
 
-// Update sản phẩm
+
+// ===============================
+// Cập nhật sản phẩm
+// ===============================
 exports.updateProduct = async (req, res) => {
+
   try {
-    const { name, price, category, stock, description } = req.body;
-    const updateData = {
+
+    const {
       name,
       price,
-      category,
+      id_category,
+      description,
       stock,
-      description
-    };
+      specifications,
+      status
+    } = req.body;
 
-    if (req.file) updateData.image = req.file.filename;
+    const product = await Product.findById(req.params.id);
 
-    await Product.findByIdAndUpdate(req.params.id, updateData);
+    product.name = name;
+    product.price = price;
+    product.id_category = id_category;
+    product.description = description;
+    product.stock = stock;
+    product.status = status;
+
+    product.specifications = specifications
+      ? JSON.parse(specifications)
+      : {};
+
+    if (req.file) {
+      product.image = req.file.filename;
+    }
+
+    await product.save();
+
     res.redirect("/admin/products");
-  } catch (error) {
-    console.log(error);
-    res.send("Lỗi update sản phẩm");
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Lỗi cập nhật sản phẩm");
+
   }
+
 };
 
+
+// ===============================
 // Xóa sản phẩm
+// ===============================
 exports.deleteProduct = async (req, res) => {
+
   try {
+
     await Product.findByIdAndDelete(req.params.id);
+
     res.redirect("/admin/products");
-  } catch (error) {
-    console.log(error);
+
+  } catch (err) {
+
+    console.log(err);
     res.send("Lỗi xóa sản phẩm");
+
   }
+
+};
+
+
+// ===============================
+// Đổi trạng thái sản phẩm
+// ===============================
+exports.changeStatus = async (req, res) => {
+
+  try {
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.send("Không tìm thấy sản phẩm");
+    }
+
+    product.status = product.status == 1 ? 0 : 1;
+
+    await product.save();
+
+    res.redirect("/admin/products");
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Lỗi đổi trạng thái");
+
+  }
+
 };

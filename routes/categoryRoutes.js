@@ -1,19 +1,21 @@
 const express = require("express");
 const router = express.Router();
+
 const categoryController = require("../controllers/categoryController");
+const { isAuthenticated } = require("../middleware/auth");
 
-// Danh sách danh mục
-router.get("/admin/categories", categoryController.getCategories);
+router.get("/", categoryController.getCategories);
 
-// Form thêm
-router.get("/admin/categories/add", categoryController.getAddCategory);
-router.post("/admin/categories/add", categoryController.createCategory);
+router.get("/add", categoryController.getAddCategory);
 
-// Form sửa
-router.get("/admin/categories/edit/:id", categoryController.getEditCategory);
-router.post("/admin/categories/edit/:id", categoryController.updateCategory);
+router.post("/add", categoryController.createCategory);
 
-// Xóa
-router.get("/admin/categories/delete/:id", categoryController.deleteCategory);
+router.get("/edit/:id", categoryController.getEditCategory);
+
+router.post("/edit/:id", categoryController.updateCategory);
+
+router.get("/delete/:id", categoryController.deleteCategory);
+
+router.get("/toggle-status/:id", categoryController.toggleStatus);
 
 module.exports = router;

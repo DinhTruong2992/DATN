@@ -5,20 +5,27 @@ const Product = require("../models/Product");
 const Category = require("../models/Category");
 const User = require("../models/user");
 
-router.get("/dashboard", async (req, res) => {
-  try {
-    const productCount = await Product.countDocuments();
-    const categoryCount = await Category.countDocuments();
-    const userCount = await User.countDocuments();
+router.get("/", async (req, res) => {
 
-    res.render("dashboard", {
-      productCount,
-      categoryCount,
-      userCount
+  try {
+
+    const totalProducts = await Product.countDocuments();
+    const totalCategories = await Category.countDocuments();
+    const totalUsers = await User.countDocuments();
+
+    res.render("admin", {
+      totalProducts,
+      totalCategories,
+      totalUsers
     });
-  } catch (error) {
-    console.log(error);
+
+  } catch (err) {
+
+    console.log(err);
+    res.send("Dashboard error");
+
   }
+
 });
 
 module.exports = router;
